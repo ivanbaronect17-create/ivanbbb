@@ -26,7 +26,7 @@ h1 a:hover { text-decoration: underline; }
 .post-title a { color: #111; text-decoration: none; cursor: pointer; }
 .post-title a:hover { text-decoration: underline; }
 .post-meta { font-size: 12px; color: #999; margin: 5px 0 10px; font-family: monospace; }
-.post-snippet { font-size: 14px; color: #444; line-height: 1.85; }
+.post-snippet { font-size: 14px; color: #444; line-height: 1.85; white-space: pre-wrap; }
 .post-read-more { font-size: 13px; color: #aaa; font-style: italic; margin-top: 8px; cursor: pointer; display: inline-block; }
 .post-read-more:hover { color: #111; }
 
@@ -103,13 +103,14 @@ function renderList() {
   const c = document.getElementById('posts-container');
   let html = '';
   for (const p of posts) {
-    const words = p.body.trim().split(/\s+/);
-    const preview = words.slice(0, 55).join(' ');
-    const hasMore = words.length > 55;
+    const cleanBody = p.body.trim().replace(/[ \t\u00a0]+/g, ' ');
+    const words = cleanBody.split(/([ \n])/);
+    const preview = words.slice(0, 110).join('');
+    const hasMore = cleanBody.split(/\s+/).length > 55;
     html += `<div class="post-item">
       <div class="post-title"><a onclick="showPost(${p.id})">${esc(p.title)}</a></div>
       <div class="post-meta">${formatDate(p.date)}</div>
-      <div class="post-snippet">${esc(preview)}${hasMore ? '…' : ''}</div>
+      <div class="post-snippet">${esc(preview.trim())}${hasMore ? '…' : ''}</div>
       ${hasMore ? `<span class="post-read-more" onclick="showPost(${p.id})">leggi tutto →</span>` : ''}
     </div>`;
   }
