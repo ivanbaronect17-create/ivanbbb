@@ -123,7 +123,7 @@ function showPost(id) {
   document.getElementById('full-post').style.display = 'block';
   document.getElementById('fp-title').textContent = p.title;
   document.getElementById('fp-meta').textContent = formatDate(p.date);
-  document.getElementById('fp-body').textContent = p.body.trim();
+  document.getElementById('fp-body').innerHTML = esc(p.body.trim()).replace(/\n/g, '<br>');
   window.scrollTo(0, 0);
 }
 
