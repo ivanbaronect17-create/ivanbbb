@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>blog</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #ffffff; }
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  background: #ffffff;
+  color: #111;
+  font-size: 15px;
+  line-height: 1.75;
+}
+#app { max-width: 660px; margin: 0 auto; padding: 2.5rem 1.25rem; }
+
+h1 { font-size: 20px; font-weight: bold; margin-bottom: 2rem; }
+h1 a { color: #111; text-decoration: none; cursor: pointer; }
+h1 a:hover { text-decoration: underline; }
+
+.post-item { margin-bottom: 2.5rem; border-bottom: 1px solid #f0f0f0; padding-bottom: 2rem; }
+.post-item:last-child { border-bottom: none; }
+.post-title { font-size: 16px; font-weight: bold; }
+.post-title a { color: #111; text-decoration: none; cursor: pointer; }
+.post-title a:hover { text-decoration: underline; }
+.post-meta { font-size: 12px; color: #999; margin: 5px 0 10px; font-family: monospace; }
+.post-snippet { font-size: 14px; color: #444; line-height: 1.85; }
+.post-read-more { font-size: 13px; color: #aaa; font-style: italic; margin-top: 8px; cursor: pointer; display: inline-block; }
+.post-read-more:hover { color: #111; }
+
+.footer { margin-top: 2.5rem; font-size: 12px; color: #ccc; border-top: 1px solid #f0f0f0; padding-top: 1rem; font-family: monospace; }
+
+#full-post { display: none; }
+.fp-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+.fp-meta { font-size: 12px; color: #999; margin-bottom: 1.75rem; font-family: monospace; }
+.fp-body { font-size: 15px; line-height: 1.9; white-space: pre-wrap; word-break: break-word; }
+#back-btn { font-size: 13px; color: #aaa; cursor: pointer; margin-bottom: 1.75rem; display: inline-block; font-family: monospace; }
+#back-btn:hover { color: #111; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="list-view">
+    <h1><a onclick="showList()">blog</a></h1>
+    <div id="posts-container"></div>
+    <div class="footer">ivan · psicologia</div>
+  </div>
+
+  <div id="full-post">
+    <span id="back-btn" onclick="showList()">← indietro</span>
+    <div class="fp-title" id="fp-title"></div>
+    <div class="fp-meta" id="fp-meta"></div>
+    <div class="fp-body" id="fp-body"></div>
+    <div class="footer" style="margin-top:2.5rem;">ivan · psicologia</div>
+  </div>
+</div>
+
+<script>
+
+// =====================================================
+// I TUOI POST — aggiungi qui nuovi oggetti in cima
+// =====================================================
+const posts = [
+
+  {
+    id: 2,
+    title: "Il silenzio in seduta",
+    date: "2026-06-25",
+    body: `Il silenzio in terapia non è assenza di comunicazione. È forse la forma più densa di presenza che esista nello spazio analitico.
+
+Winnicott parlava della capacità di stare soli in presenza dell'altro — un paradosso apparente che descrive qualcosa di preciso: quel momento in cui il paziente smette di esibirsi e comincia semplicemente a essere.
+
+Il terapeuta che tollera il silenzio senza ansia trasmette qualcosa di fondamentale: che non è necessario riempire ogni vuoto, che l'esistenza non richiede giustificazione continua.
+
+È una delle cose più difficili da imparare. E una delle più importanti.`
+  },
+
+  {
+    id: 1,
+    title: "Perché ho scelto la psicologia",
+    date: "2026-06-20",
+    body: `Non è stata una scelta razionale. È stata una scelta di sopravvivenza.
+
+A diciassette anni leggevo Freud di nascosto come altri leggevano romanzi proibiti — non per imparare qualcosa, ma perché quelle pagine nominavano cose che pensavo fossero solo mie, solo mie e illeggibili.
+
+La psicologia mi ha dato un linguaggio. Prima del linguaggio c'era solo la pressione — quella sensazione che qualcosa dentro non tornasse, senza parole per dirlo.
+
+Poi ho capito che dare un nome alle cose non le risolve. Ma le rende abitabili.`
+  }
+
+];
+// =====================================================
+
+function formatDate(str) {
+  const [y, m, d] = str.split('-');
+  const mesi = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  return `${parseInt(d)} ${mesi[parseInt(m)-1]} ${y}`;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderList() {
+  const c = document.getElementById('posts-container');
+  let html = '';
+  for (const p of posts) {
+    const words = p.body.trim().split(/\s+/);
+    const preview = words.slice(0, 55).join(' ');
+    const hasMore = words.length > 55;
+    html += `<div class="post-item">
+      <div class="post-title"><a onclick="showPost(${p.id})">${esc(p.title)}</a></div>
+      <div class="post-meta">${formatDate(p.date)}</div>
+      <div class="post-snippet">${esc(preview)}${hasMore ? '…' : ''}</div>
+      ${hasMore ? `<span class="post-read-more" onclick="showPost(${p.id})">leggi tutto →</span>` : ''}
+    </div>`;
+  }
+  c.innerHTML = html;
+}
+
+function showPost(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('list-view').style.display = 'none';
+  document.getElementById('full-post').style.display = 'block';
+  document.getElementById('fp-title').textContent = p.title;
+  document.getElementById('fp-meta').textContent = formatDate(p.date);
+  document.getElementById('fp-body').textContent = p.body.trim();
+  window.scrollTo(0, 0);
+}
+
+function showList() {
+  document.getElementById('list-view').style.display = 'block';
+  document.getElementById('full-post').style.display = 'none';
+}
+
+renderList();
+</script>
+</body>
+</html>
